@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  mysqlservice:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    container_name: mysql-container-micro1
+    networks:
+      - user-product-net
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USERNAME: user
+      MYSQL_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+  mongodbservice:
+    image: mongo:latest
+    container_name: mongo-container1
+    networks:
+      - user-product-net
+    ports:
+      - "27017:27017"
+
+  userauthenticationservice:
+    container_name: user-authentication-service-micro1
+    build: UserAuthenticationService/
+    networks:
+      - user-product-net
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mysqlservice
+    restart: always
+
+  userproductservice:
+    container_name: user-product-service
+    build: UserMovieService/
+    networks:
+      - user-product-net
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodbservice
+    restart: always
+
+networks:
+  user-product-net:
+    driver: bridge
+
+
+
+
+
+
+
+
